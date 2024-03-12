@@ -23,6 +23,16 @@ const SavedDesign = ({ savedDesignString, handleGoBack }) => {
     }
   }, [savedDesignString]);
 
+  
+  const handleDeleteDesign = (id) => {
+    // Filter out the design with the specified id
+    const updatedDesigns = savedDesigns.filter(design => design.id !== id);
+    setSavedDesigns(updatedDesigns);
+    
+    // Update local storage with the updated designs
+    localStorage.setItem('CanvasState', JSON.stringify(updatedDesigns));
+  }
+
 
   
   return (
@@ -37,7 +47,13 @@ const SavedDesign = ({ savedDesignString, handleGoBack }) => {
             id={savedDesign.id}
             color={savedDesign.color}
             colors={colors} />
-            
+            <CustomButton 
+            type="filled"
+            title="Delete"
+            handleClick={() => handleDeleteDesign(savedDesign.id)}
+            customStyles="w-fit px-4 py-2.5 font-bold text-sm"
+          />
+            <div style={{padding: "1rem"}}></div>
         </div>
       ))}
       <CustomButton 

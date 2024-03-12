@@ -158,6 +158,7 @@ const Customizer = ({handleViewSavedDesigns}) => {
     console.log('Shirt Color in customiser:', snap.color);
     saveCanvasState(designDetails)
     console.log(designDetails)
+    alert('Your design has been saved!');
   }
 
 
@@ -198,7 +199,7 @@ const Customizer = ({handleViewSavedDesigns}) => {
             className="absolute z-10 top-5 right-5"
             {...fadeAnimation}
           >
-            <div style={{ display: 'flex', gap: '1.2rem' }}>
+            <div className="flex flex-col sm:flex-row gap-4">
             <CustomButton 
               type="filled"
               title="Go Back"

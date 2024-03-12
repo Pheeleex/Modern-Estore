@@ -46,7 +46,7 @@ const CanvasModel = () => {
       {hdrFileData && <Environment preset="city" files={hdrFileData} />}
 
       <CameraRig>
-       <Backdrop /> 
+     {/* <Backdrop /> */}
         <Center>
         <Shirt color={color} />
         </Center>
