@@ -5,7 +5,6 @@ import { useSnapshot } from 'valtio';
 import state from '../store';
 
 const SavedDesign = ({ savedDesignString, handleGoBack }) => {
-  const [savedDesigns, setSavedDesigns] = useState([])
   const [colors, setColors] = useState([])
   const snap = useSnapshot(state)
 
@@ -16,7 +15,7 @@ const SavedDesign = ({ savedDesignString, handleGoBack }) => {
         ...design,
         id: index // Generate a unique ID for each design
       }));
-      setSavedDesigns(parsedDesigns);
+      state.savedDesign = parsedDesigns
 
       const extractedColors = parsedDesigns.map((design) =>  (design.color))
       setColors(extractedColors)
@@ -26,19 +25,19 @@ const SavedDesign = ({ savedDesignString, handleGoBack }) => {
   
   const handleDeleteDesign = (id) => {
     // Filter out the design with the specified id
-    const updatedDesigns = savedDesigns.filter(design => design.id !== id);
-    setSavedDesigns(updatedDesigns);
-    
+    const updatedDesigns = state.savedDesign.filter((design) => design.id !== id);
+    state.savedDesign = updatedDesigns; // Update the state with the updated designs
+
     // Update local storage with the updated designs
     localStorage.setItem('CanvasState', JSON.stringify(updatedDesigns));
-  }
+  };
 
 
   
   return (
     <div style={{ marginTop: '4rem' }}>
       <h2>Saved Design Details</h2>
-      { savedDesigns && savedDesigns.map((savedDesign) => (
+      { state.savedDesign && state.savedDesign.map((savedDesign) => (
         <div key={savedDesign.id}>
           <p>Shirt Color: {savedDesign.color}</p>
           <p>File Chosen: {savedDesign.file}</p>

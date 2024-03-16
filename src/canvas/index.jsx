@@ -16,7 +16,7 @@ const CanvasModel = () => {
  
 
   useEffect(() => {
-    const hdrFilePath = '/hdr/potsdamer_platz_1k.hdr'; // Correct relative path to HDR file
+    const hdrFilePath = '/HDR/potsdamer_platz_1k.ekr'; // Correct relative path to HDR file
 
     fetch(hdrFilePath)
       .then(response => response.blob())
