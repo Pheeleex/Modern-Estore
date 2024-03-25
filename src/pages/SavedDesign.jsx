@@ -3,26 +3,22 @@ import { CustomButton } from '../components';
 import NewCanvas from '../canvas/NewCanvas';
 import { useSnapshot } from 'valtio';
 import state from '../store';
+import NewShirt from '../canvas/NewShirt';
 
-const SavedDesign = ({ savedDesignString, handleGoBack }) => {
-  const [colors, setColors] = useState([])
-  const snap = useSnapshot(state)
+const SavedDesign = ({ savedDesignString, handleGoBack, color }) => {
+  const [selectedDesignIndex, setSelectedDesignIndex] = useState(0); // State to track the selected design index
+  const snap = useSnapshot(state);
 
-  
   useEffect(() => {
     if (savedDesignString) {
       const parsedDesigns = JSON.parse(savedDesignString).map((design, index) => ({
         ...design,
         id: index // Generate a unique ID for each design
       }));
-      state.savedDesign = parsedDesigns
-
-      const extractedColors = parsedDesigns.map((design) =>  (design.color))
-      setColors(extractedColors)
+      state.savedDesign = parsedDesigns;
     }
   }, [savedDesignString]);
 
-  
   const handleDeleteDesign = (id) => {
     // Filter out the design with the specified id
     const updatedDesigns = state.savedDesign.filter((design) => design.id !== id);
@@ -32,30 +28,37 @@ const SavedDesign = ({ savedDesignString, handleGoBack }) => {
     localStorage.setItem('CanvasState', JSON.stringify(updatedDesigns));
   };
 
+  const handleShowDesign = (index) => {
+    setSelectedDesignIndex(index);
+  };
 
-  
   return (
     <div style={{ marginTop: '4rem' }}>
       <h2>Saved Design Details</h2>
-      { state.savedDesign && state.savedDesign.map((savedDesign) => (
-        <div key={savedDesign.id}>
-          <p>Shirt Color: {savedDesign.color}</p>
-          <p>File Chosen: {savedDesign.file}</p>
-          <NewCanvas
-            savedDesign={savedDesign}
-            id={savedDesign.id}
-            color={savedDesign.color}
-            colors={colors} />
-            <CustomButton 
-            type="filled"
-            title="Delete"
-            handleClick={() => handleDeleteDesign(savedDesign.id)}
-            customStyles="w-fit px-4 py-2.5 font-bold text-sm"
-          />
-            <div style={{padding: "1rem"}}></div>
-        </div>
-      ))}
-      <CustomButton 
+      {state.savedDesign &&
+        state.savedDesign.map((savedDesign, index) => (
+          <div key={savedDesign.id}>
+            <p>Shirt Color: {savedDesign.color}</p>
+            <p>File Chosen: {savedDesign.file}</p>
+            <CustomButton
+              type="filled"
+              title="Delete"
+              handleClick={() => handleDeleteDesign(savedDesign.id)}
+              customStyles="w-fit px-4 py-2.5 font-bold text-sm"
+            />
+            <CustomButton
+              type="filled"
+              title={`Show Design ${index + 1}`}
+              handleClick={() => handleShowDesign(index)}
+              customStyles="w-fit px-4 py-2.5 font-bold text-sm"
+            />
+            <div style={{ padding: '1rem' }}></div>
+          </div>
+        ))}
+      <NewCanvas color={state.savedDesign[selectedDesignIndex]?.color}
+        id={state.savedDesign[selectedDesignIndex]?.id}
+        key={state.savedDesign[selectedDesignIndex]?.id} /> {/* Add key prop */}
+      <CustomButton
         type="filled"
         title="GoBack"
         handleClick={handleGoBack}
@@ -66,4 +69,3 @@ const SavedDesign = ({ savedDesignString, handleGoBack }) => {
 };
 
 export default SavedDesign;
-

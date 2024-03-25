@@ -3,6 +3,7 @@ import { Canvas } from '@react-three/fiber';
 import { Environment, Center } from '@react-three/drei';
 import CameraRig from './CameraRig';
 import NewShirt from './NewShirt';
+import { AnimatePresence } from 'framer-motion';
 
 const NewCanvas = ({color,id, savedDesign }) => {
   
@@ -41,12 +42,12 @@ const NewCanvas = ({color,id, savedDesign }) => {
       {hdrFileData && <Environment preset="city" files={hdrFileData} />}
       <CameraRig>
         <Center>
-          
+          <AnimatePresence>
               <NewShirt color={color}
               id={id}
               savedDesign={savedDesign}
             />
-           
+           </AnimatePresence>
           
         </Center>
       </CameraRig>

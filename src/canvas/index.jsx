@@ -1,11 +1,12 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, Suspense} from 'react';
 import { Canvas } from '@react-three/fiber'
-import { Environment, Center } from '@react-three/drei';
+import { Environment, Center, OrbitControls } from '@react-three/drei';
 import { useSnapshot } from 'valtio';
 import Shirt from './Shirt';
 import Backdrop from './Backdrop';
 import CameraRig from './CameraRig';
 import state from '../store';
+import Loader from '../components/Loader';
 
 const CanvasModel = () => {
   const snap = useSnapshot(state);
@@ -48,7 +49,11 @@ const CanvasModel = () => {
       <CameraRig>
      {/* <Backdrop /> */}
         <Center>
-        <Shirt color={color} />
+        <Suspense fallback={<Loader />}>
+          <Shirt color={color} />
+        </Suspense>
+
+      
         </Center>
       </CameraRig>
     </Canvas>
