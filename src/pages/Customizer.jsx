@@ -154,8 +154,10 @@ const Customizer = ({handleViewSavedDesigns}) => {
   const handleSavedDesign = () => {
     const designDetails = {
       color: snap.color,
+      file: file.name
     }
     console.log('Shirt Color in customiser:', snap.color);
+    console.log('Shirt File in customiser:', file);
     saveCanvasState(designDetails)
     console.log(designDetails)
     alert('Your design has been saved!');

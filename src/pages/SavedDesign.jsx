@@ -35,11 +35,11 @@ const SavedDesign = ({ savedDesignString, handleGoBack, color }) => {
   return (
     <div style={{ marginTop: '4rem' }}>
       <h2>Saved Design Details</h2>
-      {state.savedDesign &&
+      {state.savedDesign && state.savedDesign.length > 0 ? (
         state.savedDesign.map((savedDesign, index) => (
           <div key={savedDesign.id}>
             <p>Shirt Color: {savedDesign.color}</p>
-            <p>File Chosen: {savedDesign.file}</p>
+            <p>File Chosen: {savedDesign.file.split('.')[0]}</p>
             <CustomButton
               type="filled"
               title="Delete"
@@ -54,7 +54,10 @@ const SavedDesign = ({ savedDesignString, handleGoBack, color }) => {
             />
             <div style={{ padding: '1rem' }}></div>
           </div>
-        ))}
+        ))
+      ) : (
+        <p>No saved designs found.</p>
+      )}
       <NewCanvas color={state.savedDesign[selectedDesignIndex]?.color}
         id={state.savedDesign[selectedDesignIndex]?.id}
         key={state.savedDesign[selectedDesignIndex]?.id} /> {/* Add key prop */}
