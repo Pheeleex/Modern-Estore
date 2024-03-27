@@ -5,7 +5,7 @@ import CameraRig from './CameraRig';
 import NewShirt from './NewShirt';
 import { AnimatePresence } from 'framer-motion';
 
-const NewCanvas = ({color,id, savedDesign }) => {
+const NewCanvas = ({color,id, savedDesign, imgDecal }) => {
   
   const [hdrFileData, setHdrFileData] = useState(null);
  
@@ -46,6 +46,7 @@ const NewCanvas = ({color,id, savedDesign }) => {
               <NewShirt color={color}
               id={id}
               savedDesign={savedDesign}
+              imgDecal={imgDecal}
             />
            </AnimatePresence>
           

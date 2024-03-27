@@ -151,17 +151,27 @@ const Customizer = ({handleViewSavedDesigns}) => {
   }
   
 
-  const handleSavedDesign = () => {
+  const handleSavedDesign = async (event) => {
     const designDetails = {
       color: snap.color,
-      file: file.name
-    }
+      file: file.name,
+      imageData: file ? await getFileAsBase64(file) :snap.logoDecal, // Convert file to Base64 if file is defined
+    };
+    saveCanvasState(designDetails);
+    alert('Your design has been saved!');
     console.log('Shirt Color in customiser:', snap.color);
     console.log('Shirt File in customiser:', file);
-    saveCanvasState(designDetails)
     console.log(designDetails)
-    alert('Your design has been saved!');
-  }
+}
+
+const getFileAsBase64 = async (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = (error) => reject(error);
+  });
+};
 
 
 

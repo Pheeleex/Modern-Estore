@@ -5,15 +5,18 @@ import { useFrame } from '@react-three/fiber';
 import { Decal, useGLTF, useTexture } from '@react-three/drei';
 import state from '../store';
 
-const NewShirt = ({ color, id }) => {
+const NewShirt = ({ color, id, imgDecal }) => {
   const [shirtColor, setShirtColor] = useState(color); // Local state for shirt color
 
   const snap = useSnapshot(state);
   console.log("NewShirt - Color:", shirtColor);
 
   const { nodes, materials } = useGLTF('/shirt_baked.glb');
+
   const logoTexture = useTexture(snap.logoDecal);
   const fullTexture = useTexture(snap.fullDecal);
+  
+  const savedImgTexture = imgDecal ? useTexture(imgDecal) : null; // Check if imgDecal is defined
 
   useFrame((state, delta) => {
     easing.dampC(materials.lambert1.color, shirtColor, 0.25, delta); // Use local shirtColor state
@@ -33,7 +36,20 @@ const NewShirt = ({ color, id }) => {
       dispose={null}
       key={uniqueKey}
     >
-      {snap.isFullTexture && (
+      
+
+     {  savedImgTexture && (   <Decal
+          position={[0, 0.04, 0.15]}
+          rotation={[0, 0, 0]}
+          scale={0.15}
+          map={savedImgTexture}
+          anisotropy={16}
+          depthTest={false}
+          depthWrite={true}
+        />  )}
+
+
+{snap.isFullTexture && (
         <Decal
           position={[0, 0, 0]}
           rotation={[0, 0, 0]}
@@ -42,7 +58,7 @@ const NewShirt = ({ color, id }) => {
         />
       )}
 
-      {snap.isLogoTexture && (
+      { (!imgDecal && snap.isLogoTexture) && (
         <Decal
           position={[0, 0.04, 0.15]}
           rotation={[0, 0, 0]}
@@ -53,6 +69,8 @@ const NewShirt = ({ color, id }) => {
           depthWrite={true}
         />
       )}
+    
+   
     </mesh>
   );
 };
