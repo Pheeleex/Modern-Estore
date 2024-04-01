@@ -4,6 +4,7 @@ import { useSnapshot } from 'valtio';
 import { useFrame } from '@react-three/fiber';
 import { Decal, useGLTF, useTexture } from '@react-three/drei';
 import state from '../store';
+import { AnimatePresence, motion } from 'framer-motion';
 
 const NewShirt = ({ color, id, imgDecal }) => {
   const [shirtColor, setShirtColor] = useState(color); // Local state for shirt color
@@ -28,7 +29,11 @@ const NewShirt = ({ color, id, imgDecal }) => {
   console.log(uniqueKey);
 
   return (
-    <mesh
+    <div
+    initial={{y:0}}
+    whileInView={{y:[90, 0]}}
+    transition={{duration: 3}}>
+        <mesh
       castShadow
       geometry={nodes.T_Shirt_male.geometry}
       material={materials.lambert1}
@@ -72,6 +77,8 @@ const NewShirt = ({ color, id, imgDecal }) => {
     
    
     </mesh>
+    </div>
+    
   );
 };
 

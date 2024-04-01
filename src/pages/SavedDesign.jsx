@@ -32,48 +32,62 @@ const SavedDesign = ({ savedDesignString, handleGoBack, color, imgDecal }) => {
     setRefreshKey((prevKey) => prevKey +1)
   };
 
-  const handleShowDesign = (index) => {
-    setSelectedDesignIndex(index);
+  const handleNextDesign = () => {
+    setSelectedDesignIndex((prevIndex) => Math.min(prevIndex + 1, state.savedDesign.length - 1));
+  };
+
+  const handlePreviousDesign = () => {
+    setSelectedDesignIndex((prevIndex) => Math.max(prevIndex - 1, 0));
   };
 
   return (
-    <div key={refreshKey} style={{ marginTop: '4rem' }}>
+    <div key={refreshKey} className='mt-20 mx-20 mb-20'>
       <h2>Saved Design Details</h2>
-      {state.savedDesign && state.savedDesign.length > 0 ? (
-        state.savedDesign.map((savedDesign, index) => (
-          <div key={savedDesign.id}>
-            <p>Shirt Color: {savedDesign.color}</p>
-            <p>File Chosen: {savedDesign.file}</p>+
+      <div>
+        {state.savedDesign && state.savedDesign.length > 0 ? (
+          <div key={state.savedDesign[selectedDesignIndex].id}>
+            <p>Shirt Color: {state.savedDesign[selectedDesignIndex].color}</p>
+            <p>File Chosen: {state.savedDesign[selectedDesignIndex].file}</p>
             <CustomButton
-              type="filled"
+              type="outline"
               title="Delete"
-              handleClick={() => handleDeleteDesign(savedDesign.id)}
-              customStyles="w-fit px-4 py-2.5 font-bold text-sm"
+              handleClick={() => handleDeleteDesign(state.savedDesign[selectedDesignIndex].id)}
+              customStyles="w-40 px-4 py-2.5 font-bold text-sm"
             />
-            <CustomButton
-              type="filled"
-              title={`Show Design ${index + 1}`}
-              handleClick={() => handleShowDesign(index)}
-              customStyles="w-fit px-4 py-2.5 font-bold text-sm"
-            />
-            
           </div>
-        ))
-      ) : (
-        <p>No saved designs found.</p>
-      )}
+        ) : (
+          <p>No saved designs found.</p>
+        )}
+      </div>
       <NewCanvas color={state.savedDesign[selectedDesignIndex]?.color}
           imgDecal={state.savedDesign[selectedDesignIndex]?.imageData}
         id={state.savedDesign[selectedDesignIndex]?.id}
         key={state.savedDesign[selectedDesignIndex]?.id} /> {/* Add key prop */}
+      <div className="flex justify-between mt-4">
+      <CustomButton
+    type="filled"
+    title="Previous Design"
+    handleClick={handlePreviousDesign}
+    customStyles="flex-grow-0 w-3/4 px-4 py-2.5 font-bold text-sm justify-self-center"
+  />
+  
+  <span className="self-center">Saved Design {selectedDesignIndex + 1}</span>
+  <CustomButton
+    type="outline"
+    title="Next Design"
+    handleClick={handleNextDesign}
+    customStyles="flex-grow-0 w-3/4 px-4 py-2.5 font-bold text-sm justify-self-center"
+  />
+      </div>
       <CustomButton
         type="filled"
         title="GoBack"
         handleClick={handleGoBack}
-        customStyles="w-fit px-4 py-2.5 font-bold text-sm"
+        customStyles="w-fit px-4 py-2.5 font-bold text-sm mt-4"
       />
     </div>
   );
 };
 
 export default SavedDesign;
+
