@@ -29,10 +29,7 @@ const NewShirt = ({ color, id, imgDecal }) => {
   console.log(uniqueKey);
 
   return (
-    <div
-    initial={{y:0}}
-    whileInView={{y:[90, 0]}}
-    transition={{duration: 3}}>
+  
         <mesh
       castShadow
       geometry={nodes.T_Shirt_male.geometry}
@@ -77,8 +74,6 @@ const NewShirt = ({ color, id, imgDecal }) => {
     
    
     </mesh>
-    </div>
-    
   );
 };
 
