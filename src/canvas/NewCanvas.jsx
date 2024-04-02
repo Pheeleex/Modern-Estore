@@ -28,7 +28,7 @@ const NewCanvas = ({ color, id, savedDesign, imgDecal }) => {
   }, []);
 
   return (
-    <div style={{ width: '50%', height: '50vh', margin: '0px auto' }}>
+    <div style={{ width: '80%', height: '50vh', margin: '0px auto' }}>
       <Canvas
         shadows
         camera={{ position: [0, 0, 0], fov: 25 }}

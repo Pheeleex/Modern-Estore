@@ -45,14 +45,14 @@ const SavedDesign = ({ savedDesignString, handleGoBack, color, imgDecal }) => {
       <h2>Saved Design Details</h2>
       <div>
         {state.savedDesign && state.savedDesign.length > 0 ? (
-          <div key={state.savedDesign[selectedDesignIndex].id}>
+          <div key={state.savedDesign[selectedDesignIndex].id} className='flex flex-col justify-between md:flex-row align-center'>
             <p>Shirt Color: {state.savedDesign[selectedDesignIndex].color}</p>
             <p>File Chosen: {state.savedDesign[selectedDesignIndex].file}</p>
             <CustomButton
               type="outline"
               title="Delete"
               handleClick={() => handleDeleteDesign(state.savedDesign[selectedDesignIndex].id)}
-              customStyles="w-40 px-4 py-2.5 font-bold text-sm"
+              customStyles="flex-grow-0 w-3/4 px-4 py-2.5 font-bold text-sm justify-self-center"
             />
           </div>
         ) : (
@@ -63,7 +63,7 @@ const SavedDesign = ({ savedDesignString, handleGoBack, color, imgDecal }) => {
           imgDecal={state.savedDesign[selectedDesignIndex]?.imageData}
         id={state.savedDesign[selectedDesignIndex]?.id}
         key={state.savedDesign[selectedDesignIndex]?.id} /> {/* Add key prop */}
-      <div className="flex justify-between mt-4">
+     <div className="flex  flex-col md:flex-row lg:flex-row items-center justify-between mt-4 ">
       <CustomButton
     type="filled"
     title="Previous Design"
