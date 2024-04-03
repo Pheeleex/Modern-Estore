@@ -41,7 +41,7 @@ const SavedDesign = ({ savedDesignString, handleGoBack, color, imgDecal }) => {
   };
 
   return (
-    <div key={refreshKey} className='mt-20 mx-20 mb-20'>
+    <div key={refreshKey} className='mt-20 mx-10 lg:mx-20  mb-20'>
       <h2>Saved Design Details</h2>
       <div>
         {state.savedDesign && state.savedDesign.length > 0 ? (
@@ -68,15 +68,19 @@ const SavedDesign = ({ savedDesignString, handleGoBack, color, imgDecal }) => {
     type="filled"
     title="Previous Design"
     handleClick={handlePreviousDesign}
-    customStyles="flex-grow-0 w-3/4 px-4 py-2.5 font-bold text-sm justify-self-center"
+    customStyles={`flex-grow-0 w-3/4 px-4 py-2.5 font-bold text-sm justify-self-center 
+    ${selectedDesignIndex === 0 ? 'bg-gray-500 cursor-not-allowed' : ''}`}
+    disabled={selectedDesignIndex === 0}
   />
   
   <span className="self-center">Saved Design {selectedDesignIndex + 1}</span>
   <CustomButton
-    type="outline"
+    type="filled"
     title="Next Design"
     handleClick={handleNextDesign}
-    customStyles="flex-grow-0 w-3/4 px-4 py-2.5 font-bold text-sm justify-self-center"
+    customStyles={`flex-grow-0 w-3/4 px-4 py-2.5 font-bold text-sm justify-self-center 
+    ${selectedDesignIndex === state.savedDesign.length - 1 ? 'bg-gray-400 cursor-not-allowed' : ''}`}
+    disabled = {selectedDesignIndex === state.savedDesign.length - 1}
   />
       </div>
       <CustomButton
