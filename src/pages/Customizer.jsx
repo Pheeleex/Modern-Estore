@@ -6,26 +6,37 @@ import { downloadCanvasToImage, reader } from '../config/helpers';
 import { EditorTabs, FilterTabs, DecalTypes } from '../config/constants';
 import { fadeAnimation, slideAnimation } from '../config/motion';
 import { AIPicker, ColorPicker, CustomButton, FilePicker, Tab } from '../components';
+import Joyride from 'react-joyride';
+import { v4 as uuidv4 } from 'uuid';
+
 
 const Customizer = ({handleViewSavedDesigns}) => {
   const snap = useSnapshot(state);
   console.log(snap.intro)
   console.log(snap.color)
 
+//set state for file upload
   const [file, setFile] = useState('');
 
+//set state for AI prompts
   const [prompt, setPrompt] = useState('');
   const [generatingImg, setGeneratingImg] = useState(false);
-
-  
+ 
+  //set state for handling current editor tabs
   const [activeEditorTab, setActiveEditorTab] = useState("");
   const [activeFilterTab, setActiveFilterTab] = useState({
     logoShirt: true,
     stylishShirt: false,
   })
 
+  //set state for Joyride
+  const [joyrideSteps,setJoyrideSteps] = useState([]); //state for joyride steps
+  const [showJoyRide, setShowJoyRide] = useState(true)
+  
+
 
   const handleTabClick = (tabName) => {
+    setShowJoyRide(false)
     // Toggle the active tab if the same tab is clicked again
     setActiveEditorTab((prevTab) => (prevTab === tabName ? '' : tabName));
   };
@@ -56,28 +67,22 @@ const Customizer = ({handleViewSavedDesigns}) => {
 
   const handleSubmit = async (type) => {
     if(!prompt) return alert("Please enter a prompt");
-
-   
-
     try {
       setGeneratingImg(true);
-      const response = await fetch('https://localhost:8080/api/v1/dalle', {
+      const response = await fetch("https://ai-stitches.onrender.com/api/v1/ai", {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          
+          'Content-Type': 'application/json',       
         },
         body: JSON.stringify({
-          prompt: prompt,
+          prompt,
         })
       })
 
       if (!response.ok) {
-        throw new Error('Failed to fetch response from OpenAI API');
+        throw new Error('Failed to fetch response from OpenAI API, if you like sleep');
       }
-
       const data = await response.json();
-
       handleDecals(type, `data:image/png;base64,${data.photo}`)
     } catch (error) {
       alert(error)
@@ -86,9 +91,6 @@ const Customizer = ({handleViewSavedDesigns}) => {
       setActiveEditorTab("");
     }
   }
-
-  
- 
 
   const handleDecals = (type, result) => {
     const decalType = DecalTypes[type];
@@ -114,7 +116,7 @@ const Customizer = ({handleViewSavedDesigns}) => {
     }
 
     // after setting the state, activeFilterTab is updated
-
+    setShowJoyRide(false)
     setActiveFilterTab((prevState) => {
       return {
         ...prevState,
@@ -132,7 +134,6 @@ const Customizer = ({handleViewSavedDesigns}) => {
   }
 
  
-
   const saveCanvasState = (designDetails) => {
     try {
       // Get existing designs from local storage
@@ -173,6 +174,75 @@ const getFileAsBase64 = async (file) => {
   });
 };
 
+// Initialize Joyride steps
+useEffect(() => {
+
+  const steps = [
+    {
+      target: '.tabs',
+      content: 'This is tabs help you edit the shirt properties',
+      key: 'key-1',
+    },
+    {
+      target: '.color-picker',
+      content: 'Click here to change the color of the shirt',
+      key: 'color-step'
+    },
+    {
+      target: '.file-picker',
+      content: 'Click here to add an image to the shirt, could be a logo or a full print',
+      key: 'file-step'
+    },
+    
+    {
+      target: '.ai-picker',
+      content: 'Click here to describe to our AI tool, what type of design you want',
+      key: 'aipicker-step'
+    },
+    {
+      target: '.logo-shirt',
+      content: 'Click here to add or remove the logo',
+      key: 'logo-step'
+    },
+    {
+      target: '.style-shirt',
+      content: 'Click here to add or remove the full print',
+      key: 'full-step'
+    },
+    {
+      target: '.save',
+      content: "click here when, you are ok with your design and ready to save, you can save as many designs as possible",
+      key: 'save-step'
+    },
+    {
+      target: '.view',
+      content: 'Click here to view saved designs',
+      key: 'view-step'
+    },
+    {
+      target: '.help-button',
+      content: 'Click here to go over how the buttons work again',
+      key: 'help-step'
+    }
+  ];
+
+  setJoyrideSteps(steps);
+  console.log('Joyride steps:', steps);
+  console.log('EditorTabs', EditorTabs);
+  
+ 
+}, [])
+
+
+  // Event handler for when joyride ends
+  const handleJoyrideCallback = (data) => {
+    console.log(data);  
+    // You can update state or perform actions based on joyride events
+  }
+
+  const toggleHelp = () => {
+    setShowJoyRide((prev) => !prev)
+  }
 
 
 
@@ -181,24 +251,29 @@ const getFileAsBase64 = async (file) => {
       {!snap.intro && (
         <>
           <motion.div
-            key="custom"
             className="absolute top-0 left-0 z-10"
             {...slideAnimation('left')}
           >
-            <div className="className='mt-10">
+            <div className='mt-4 flex flex-col p-0'>
+            <div className="view mx-4">
               <CustomButton
                  type="filled"
                  title="View saved design"
                  handleClick={handleViewSavedDesigns}
+                 customStyles="m-0 w-28"
                  />
+              </div>
+                 <button className="help-button rounded-full bg-yellow-500 p-1 w-10 m-4"
+                 onClick={toggleHelp}>?</button>
             </div>
             <div className="flex items-center min-h-screen">
-              <div className="editortabs-container tabs">
-                {EditorTabs.map((tab) => (
+              <div className=" editortabs-container tabs">
+                {EditorTabs.map((tab, index) => (
                   <Tab 
-                    key={tab.name}
+                  key={uuidv4()}
                     tab={tab}
                     handleClick = {() => handleTabClick(tab.name)}
+                    className= {tab.className}
                   />
                 ))}
 
@@ -207,6 +282,18 @@ const getFileAsBase64 = async (file) => {
             </div>
           </motion.div>
 
+                  {
+                    showJoyRide && (
+                      <Joyride
+                        steps={joyrideSteps}
+                        continuous={true}
+                        scrollToFirstStep={true}
+                        showProgress={true}
+                        callback={handleJoyrideCallback}
+                        key={uuidv4()}
+                      />
+                    )
+                  }
           <motion.div
             className="absolute z-10 top-5 right-5"
             {...fadeAnimation}
@@ -219,12 +306,14 @@ const getFileAsBase64 = async (file) => {
               customStyles="w-fit px-4 py-2.5 font-bold text-sm"
             />
 
+            
             <CustomButton 
               type="filled"
               title="Save Design"
               handleClick={handleSavedDesign}
-              customStyles="w-fit px-4 py-2.5 font-bold text-sm"
+              customStyles="save w-fit px-4 py-2.5 font-bold text-sm"
             />
+           
             </div>
           </motion.div>
 
@@ -232,13 +321,14 @@ const getFileAsBase64 = async (file) => {
             className='filtertabs-container'
             {...slideAnimation("up")}
           >
-            {FilterTabs.map((tab) => (
+            {FilterTabs.map((tab, index) => (
               <Tab
-                key={tab.name}
+                key={uuidv4()}
                 tab={tab}
                 isFilterTab
                 isActiveTab={activeFilterTab[tab.name]}
                 handleClick={() => handleActiveFilterTab(tab.name)}
+                className={tab.className}
               />
             ))}
           </motion.div>
