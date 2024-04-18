@@ -76,6 +76,7 @@ const Customizer = ({handleViewSavedDesigns}) => {
         },
         body: JSON.stringify({
           prompt,
+          textureType: type, // Add the textureType parameter
         })
       })
 
@@ -84,6 +85,8 @@ const Customizer = ({handleViewSavedDesigns}) => {
       }
       const data = await response.json();
       handleDecals(type, `data:image/png;base64,${data.photo}`)
+      setFile(data.photo)
+      console.log(data.photo)
     } catch (error) {
       alert(error)
     } finally {
@@ -139,6 +142,7 @@ const Customizer = ({handleViewSavedDesigns}) => {
       // Get existing designs from local storage
       const existingDesignsString = localStorage.getItem('CanvasState');
       const existingDesigns = existingDesignsString ? JSON.parse(existingDesignsString) : [];
+      
   
       // Add the new design details to the existing designs
       const updatedDesigns = [...existingDesigns, designDetails];
@@ -153,26 +157,56 @@ const Customizer = ({handleViewSavedDesigns}) => {
   
 
   const handleSavedDesign = async (event) => {
-    const designDetails = {
-      color: snap.color,
-      file: file.name,
-      imageData: file ? await getFileAsBase64(file) :snap.logoDecal, // Convert file to Base64 if file is defined
-    };
-    saveCanvasState(designDetails);
-    alert('Your design has been saved!');
-    console.log('Shirt Color in customiser:', snap.color);
-    console.log('Shirt File in customiser:', file);
-    console.log(designDetails)
-}
+    const textureType = state.isFullTexture ? 'fullTexture' : 'logoTexture';
+  
+    try {
+      const imageData = file ? await getFileAsBase64(file) : snap.logoDecal;
+      if (!imageData) {
+        throw new Error('Failed to get image data');
+      }
+  
+      const designDetails = {
+        color: snap.color,
+        file: file.name,
+        imageData: imageData,
+        textureType: textureType
+      };
+      saveCanvasState(designDetails);
+      alert('Your design has been saved!');
+      console.log('Shirt Color in customiser:', snap.color);
+      console.log('Shirt File in customiser:', file);
+      console.log(designDetails);
+    } catch (error) {
+      console.error('Error saving design:', error);
+      // Handle the error as needed, e.g., show an error message to the user
+    }
+  };
 
-const getFileAsBase64 = async (file) => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result);
-    reader.onerror = (error) => reject(error);
-  });
-};
+  const getFileAsBase64 = async (file) => {
+    if (!file) {
+      console.error('File object is null or undefined');
+      return null;
+    }
+  
+    // Check if the file is already a data URL
+    if (typeof file === 'string' && file.startsWith('data:')) {
+      return file;
+    }
+  
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+      
+      // Check if file is a Blob or File object before reading as data URL
+      if (file instanceof Blob || file instanceof File) {
+        reader.readAsDataURL(file);
+      } else {
+        reject(new Error('Invalid file type'));
+      }
+    });
+  };
+  
 
 // Initialize Joyride steps
 useEffect(() => {

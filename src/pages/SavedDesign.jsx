@@ -14,7 +14,7 @@ const SavedDesign = ({ savedDesignString, handleGoBack, color, imgDecal }) => {
     if (savedDesignString) {
       const parsedDesigns = JSON.parse(savedDesignString).map((design, index) => ({
         ...design,
-        id: index // Generate a unique ID for each design
+        id: index //Generate a unique ID for each design
       }));
       state.savedDesign = parsedDesigns;
     }
@@ -62,6 +62,7 @@ const SavedDesign = ({ savedDesignString, handleGoBack, color, imgDecal }) => {
       <NewCanvas color={state.savedDesign[selectedDesignIndex]?.color}
           imgDecal={state.savedDesign[selectedDesignIndex]?.imageData}
         id={state.savedDesign[selectedDesignIndex]?.id}
+        textureType={state.savedDesign[selectedDesignIndex]?.textureType}
         key={state.savedDesign[selectedDesignIndex]?.id} /> {/* Add key prop */}
      <div className="flex  flex-col md:flex-row lg:flex-row items-center justify-between mt-4 ">
       <CustomButton
