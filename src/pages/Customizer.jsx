@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { useSnapshot } from 'valtio';
 import state from '../store';
 import { downloadCanvasToImage, reader } from '../config/helpers';
+import { download } from "../assets";
 import { EditorTabs, FilterTabs, DecalTypes } from '../config/constants';
 import { fadeAnimation, slideAnimation } from '../config/motion';
 import { AIPicker, ColorPicker, CustomButton, FilePicker, Tab } from '../components';
@@ -244,8 +245,13 @@ useEffect(() => {
       key: 'full-step'
     },
     {
+      target: '.download-btn',
+      content: 'Click here to download your custom designs to image gallery',
+      key: 'download-step'
+    },
+    {
       target: '.save',
-      content: "click here when, you are ok with your design and ready to save, you can save as many designs as possible",
+      content: "click here when, you are ok with your design and ready to save in the app, you can save as many designs as possible",
       key: 'save-step'
     },
     {
@@ -365,6 +371,13 @@ useEffect(() => {
                 className={tab.className}
               />
             ))}
+            <button className='download-btn' onClick={downloadCanvasToImage}>
+                        <img
+                            src={download}
+                            alt='download_image'
+                            className='w-3/5 h-3/5 object-contain'
+                        />
+                    </button>
           </motion.div>
         </>
       )}
