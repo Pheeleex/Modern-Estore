@@ -303,8 +303,11 @@ useEffect(() => {
                  customStyles="m-0 w-28"
                  />
               </div>
-                 <button className="help-button rounded-full bg-yellow-500 p-1 w-10 m-4"
-                 onClick={toggleHelp}>?</button>
+                 <CustomButton
+                  type="filled"
+                  title="?"
+                  className='help-button'
+                  customStyles='fixed top-1/2 right-2 w-8 p-4' />
             </div>
             <div className="flex items-center min-h-screen">
               <div className=" editortabs-container tabs">

@@ -18,8 +18,10 @@
     "react-color": "^2.19.3",
     "react-dom": "^18.2.0",
     "react-joyride": "^2.8.0",
+    "react-type-animation": "^3.2.0",
     "tailwindcss": "^3.4.1",
     "three": "^0.157.0",
+    "typewriter-effect": "^2.21.0",
     "valtio": "^1.11.2"
   },
   "devDependencies": {

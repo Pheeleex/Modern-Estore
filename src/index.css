@@ -24,11 +24,32 @@ html {
 }
 
 .home-content {
-  @apply flex-1 xl:justify-center justify-start flex flex-col gap-10;
+  @apply flex-1 xl:justify-center justify-start flex flex-col gap-10 xl:gap-5;
 }
 
 .head-text {
-  @apply xl:text-[10rem] text-[6rem] xl:leading-[11rem] leading-[7rem] font-black text-black;
+  @apply xl:text-[7rem] text-[4rem]   font-black text-black;
+}
+
+.head-text{
+  line-height: 1.2;
+  position: absolute;
+}
+
+
+
+@media (max-width:410px) {
+  .head-text{
+    width: 10rem;
+  }
+  .para{
+    margin-top: 8rem;
+  }
+}
+
+.span-text{
+  font-size: 6.5rem;
+  margin-left: 2rem
 }
 
 .download-btn {

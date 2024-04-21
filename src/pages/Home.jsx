@@ -13,8 +13,7 @@ import {
 
 import { CustomButton } from '../components';
 import { useEffect, useState } from 'react';
-
-
+import { TypeAnimation } from 'react-type-animation';
 
 
 const Home = () => {
@@ -44,15 +43,33 @@ const Home = () => {
                     </motion.header>
                     <motion.div className='home-content'{...headContainerAnimation}>
                         <motion.div className='home-content' {...headTextAnimation}>
-                            <h1 className='head-text'>
-                                Let's <br className='xl:block hidden' /> DO IT
-                            </h1>
+                            
+                            <TypeAnimation
+                                sequence={[
+                                // Same substring at the start will only be typed out once, initially
+                                    'Your Style',
+                                    1000, // wait 1s before replacing "Mice" with "Hamsters"
+                                    'Your Rules',
+                                    1000,
+                                    'Your Looks',
+                                    1000,
+                                    'Your Wardrobe',
+                                    1000,
+                                    'Your Fits.',
+                                    1000,
+                                ]}
+                                    wrapper="h1"
+                                    speed={50}
+                                    className='head-text'
+                                    repeat={Infinity}
+                                    cursor= {false}
+                                />
                         </motion.div>
                         <motion.div
                             {...headContentAnimation}
                             className='flex flex-col gap-5'
                         >
-                            <p className='max-w-md font-normal text-gray-600 text-base'>
+                            <p className='para max-w-md font-normal text-gray-600 text-base'>
                                 Create your unique and exclusive shirt with our brand-new 3D customization tool. <strong>Bring your imagination to life</strong>{" "} and define your own style
                             </p>
                             { loaded && (
