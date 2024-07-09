@@ -36,7 +36,6 @@ const NewCanvas = ({ color, id, savedDesign, imgDecal, textureType }) => {
         className="custom-canvas" // Optional class name for additional styling
       >
         <ambientLight intensity={0.5} />
-        {hdrFileData && <Environment preset="city" files={hdrFileData} />}
         <CameraRig>
           <Center>
             <AnimatePresence>

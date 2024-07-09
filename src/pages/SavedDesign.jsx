@@ -52,7 +52,7 @@ const SavedDesign = ({ savedDesignString, handleGoBack, color, imgDecal }) => {
               type="outline"
               title="Delete"
               handleClick={() => handleDeleteDesign(state.savedDesign[selectedDesignIndex].id)}
-              customStyles="flex-grow-0 w-3/4 px-4 py-2.5 font-bold text-sm justify-self-center"
+              customStyles="flex-grow-0 w-[40%] px-4 py-2.5 font-bold text-sm justify-self-center"
             />
           </div>
         ) : (
@@ -69,7 +69,7 @@ const SavedDesign = ({ savedDesignString, handleGoBack, color, imgDecal }) => {
     type="filled"
     title="Previous Design"
     handleClick={handlePreviousDesign}
-    customStyles={`flex-grow-0 w-3/4 px-4 py-2.5 font-bold text-sm justify-self-center 
+    customStyles={`flex-grow-0 w-[40%] px-4 py-2.5 font-bold text-sm justify-self-center 
     ${selectedDesignIndex === 0 ? 'bg-gray-500 cursor-not-allowed' : ''}`}
     disabled={selectedDesignIndex === 0}
   />
@@ -79,7 +79,7 @@ const SavedDesign = ({ savedDesignString, handleGoBack, color, imgDecal }) => {
     type="filled"
     title="Next Design"
     handleClick={handleNextDesign}
-    customStyles={`flex-grow-0 w-3/4 px-4 py-2.5 font-bold text-sm justify-self-center 
+    customStyles={`flex-grow-0 w-[40%] px-4 py-2.5 font-bold text-sm justify-self-center 
     ${selectedDesignIndex === state.savedDesign.length - 1 ? 'bg-gray-400 cursor-not-allowed' : ''}`}
     disabled = {selectedDesignIndex === state.savedDesign.length - 1}
   />

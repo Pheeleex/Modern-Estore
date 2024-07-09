@@ -158,6 +158,7 @@ const Customizer = ({handleViewSavedDesigns}) => {
   
 
   const handleSavedDesign = async (event) => {
+    downloadCanvasToImage()
     const textureType = state.isFullTexture ? 'fullTexture' : 'logoTexture';
   
     try {
@@ -246,13 +247,9 @@ useEffect(() => {
     },
     {
       target: '.download-btn',
-      content: 'Click here to download your custom designs to image gallery',
+      content: `Click here to download your custom designs to image gallery
+      and in the app`,
       key: 'download-step'
-    },
-    {
-      target: '.save',
-      content: "click here when, you are ok with your design and ready to save in the app, you can save as many designs as possible",
-      key: 'save-step'
     },
     {
       target: '.view',
@@ -294,20 +291,14 @@ useEffect(() => {
             className="absolute top-0 left-0 z-10"
             {...slideAnimation('left')}
           >
-            <div className='mt-4 flex flex-col p-0'>
-            <div className="view mx-4">
-              <CustomButton
-                 type="filled"
-                 title="View saved design"
-                 handleClick={handleViewSavedDesigns}
-                 customStyles="m-0 w-28"
-                 />
-              </div>
-                 <CustomButton
-                  type="filled"
-                  title="?"
-                  className='help-button'
-                  customStyles='fixed top-1/2 right-2 w-8 p-4' />
+            <div className='mt-4 flex  p-0'>
+            <CustomButton 
+              type="filled"
+              title="Go Back"
+              handleClick={() => state.intro = true}
+              customStyles="w-fit m-2 px-4 py-2.5 font-bold text-sm"
+            />
+                 
             </div>
             <div className="flex items-center min-h-screen">
               <div className=" editortabs-container tabs">
@@ -341,22 +332,15 @@ useEffect(() => {
             className="absolute z-10 top-5 right-5"
             {...fadeAnimation}
           >
-            <div className="flex flex-col sm:flex-row gap-4">
-            <CustomButton 
-              type="filled"
-              title="Go Back"
-              handleClick={() => state.intro = true}
-              customStyles="w-fit px-4 py-2.5 font-bold text-sm"
-            />
-
-            
-            <CustomButton 
-              type="filled"
-              title="Save Design"
-              handleClick={handleSavedDesign}
-              customStyles="save w-fit px-4 py-2.5 font-bold text-sm"
-            />
-           
+            <div className="flex sm:flex-row gap-4">
+            <div className="view mx-4">
+              <CustomButton
+                 type="filled"
+                 title="View saved design"
+                 handleClick={handleViewSavedDesigns}
+                 customStyles="m-0 w-28"
+                 />
+              </div>
             </div>
           </motion.div>
 
@@ -374,13 +358,19 @@ useEffect(() => {
                 className={tab.className}
               />
             ))}
-            <button className='download-btn' onClick={downloadCanvasToImage}>
+            <button className='download-btn' onClick={handleSavedDesign}>
                         <img
                             src={download}
                             alt='download_image'
                             className='w-3/5 h-3/5 object-contain'
                         />
                     </button>
+                    <CustomButton
+                  type="filled"
+                  title="Help?"
+                  className='help-button'
+                  customStyles='max-w-[100px]' />
+
           </motion.div>
         </>
       )}
