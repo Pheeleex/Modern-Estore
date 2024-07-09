@@ -34,7 +34,7 @@ const CanvasModel = () => {
         URL.revokeObjectURL(hdrFileData);
       }
     };
-  }, []); // Removed hdrFileData from the dependency array
+  }, [hdrFileData]); // Removed hdrFileData from the dependency array
 
   return (
     <Canvas
@@ -44,7 +44,7 @@ const CanvasModel = () => {
     className="w-full max-w-full h-full transition-all ease-in"
     >
       <ambientLight intensity={0.5} />
-      {hdrFileData && <Environment preset="city" files={hdrFileData} />}
+     
 
       <CameraRig>
      {/* <Backdrop /> */}
@@ -52,8 +52,6 @@ const CanvasModel = () => {
         <Suspense fallback={<Loader />}>
           <Shirt color={color} />
         </Suspense>
-
-      
         </Center>
       </CameraRig>
     </Canvas>
