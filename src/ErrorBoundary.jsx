@@ -1,20 +1,26 @@
-import React, { useState } from 'react';
+import { Component } from 'react';
 
-const ErrorBoundary = ({ children }) => {
-  const [hasError, setHasError] = useState(false);
-
-  const handleError = (error, errorInfo) => {
-    // You can log the error to an error reporting service here
-    console.error(error, errorInfo);
-    setHasError(true);
-  };
-
-  if (hasError) {
-    // You can render any custom fallback UI here
-    return <h1>Something went wrong.</h1>;
+class ErrorBoundary extends Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
   }
 
-  return children;
-};
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error(error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <h1>Something went wrong.</h1>;
+    }
+
+    return this.props.children;
+  }
+}
 
 export default ErrorBoundary;

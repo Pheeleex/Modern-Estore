@@ -1,9 +1,7 @@
-import React from 'react';
-
 import CustomButton from './CustomButton'
 
 
-const AIPicker = ({ prompt, setPrompt, generatingImg, handleSubmit }) => {
+const AIPicker = ({ prompt, setPrompt, generatingImg, handleSubmit, error }) => {
   return (
     <div className="aipicker-container mt-8">
       <textarea
@@ -12,18 +10,22 @@ const AIPicker = ({ prompt, setPrompt, generatingImg, handleSubmit }) => {
         value={prompt}
         onChange={(e) => setPrompt(e.target.value)}
         className='aipicker-textarea'
+        disabled={generatingImg}
         />
+        {error && <p className="picker-error">{error}</p>}
         <div className='flex flex-wrap gap-3'>
           {generatingImg ? (<CustomButton
           type="outline"
-          title="Asking AI"
-          customStyles='text-xs' />): 
+          title="Generating"
+          customStyles='text-xs'
+          disabled />): 
           (<>
               <CustomButton
             type="outline"
             title="AI Logo"
             handleClick={() => handleSubmit('logo')}
             customStyles='text-xs'
+            disabled={!prompt.trim()}
              />
              
              <CustomButton
@@ -31,6 +33,7 @@ const AIPicker = ({ prompt, setPrompt, generatingImg, handleSubmit }) => {
             title="AI Full"
             handleClick={() => handleSubmit('full')}
             customStyles='text-xs'
+            disabled={!prompt.trim()}
              />
           </>
              )}

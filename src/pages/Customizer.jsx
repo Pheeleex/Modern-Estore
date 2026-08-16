@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useSnapshot } from 'valtio';
 import state from '../store';
@@ -8,42 +8,33 @@ import { EditorTabs, FilterTabs, DecalTypes } from '../config/constants';
 import { fadeAnimation, slideAnimation } from '../config/motion';
 import { AIPicker, ColorPicker, CustomButton, FilePicker, Tab } from '../components';
 import Joyride from 'react-joyride';
-import { v4 as uuidv4 } from 'uuid';
 
+const AI_ENDPOINT = "https://ai-stitches.onrender.com/api/v1/ai";
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const AI_REQUEST_TIMEOUT = 45000;
 
-const Customizer = ({handleViewSavedDesigns}) => {
+const Customizer = ({ handleDesignsChange, handleViewSavedDesigns }) => {
   const snap = useSnapshot(state);
-  console.log(snap.intro)
-  console.log(snap.color)
 
-//set state for file upload
   const [file, setFile] = useState('');
-
-//set state for AI prompts
   const [prompt, setPrompt] = useState('');
   const [generatingImg, setGeneratingImg] = useState(false);
- 
-  //set state for handling current editor tabs
   const [activeEditorTab, setActiveEditorTab] = useState("");
   const [activeFilterTab, setActiveFilterTab] = useState({
     logoShirt: true,
     stylishShirt: false,
   })
-
-  //set state for Joyride
-  const [joyrideSteps,setJoyrideSteps] = useState([]); //state for joyride steps
+  const [fileError, setFileError] = useState('');
+  const [aiError, setAiError] = useState('');
+  const [saveError, setSaveError] = useState('');
+  const [joyrideSteps,setJoyrideSteps] = useState([]);
   const [showJoyRide, setShowJoyRide] = useState(true)
-  
-
 
   const handleTabClick = (tabName) => {
     setShowJoyRide(false)
-    // Toggle the active tab if the same tab is clicked again
     setActiveEditorTab((prevTab) => (prevTab === tabName ? '' : tabName));
   };
 
-  
-  // show tab content depending on the activeTab
   const generateTabContent = () => {
     switch (activeEditorTab) {
       case "colorpicker":
@@ -51,8 +42,9 @@ const Customizer = ({handleViewSavedDesigns}) => {
       case "filepicker":
         return <FilePicker
           file={file}
-          setFile={setFile}
+          setFile={handleFileSelect}
           readFile={readFile}
+          error={fileError}
         />
       case "aipicker":
         return <AIPicker 
@@ -60,39 +52,100 @@ const Customizer = ({handleViewSavedDesigns}) => {
           setPrompt={setPrompt}
           generatingImg={generatingImg}
           handleSubmit={handleSubmit}
+          error={aiError}
         />
       default:
         return null;
     }
   }
 
+  const getErrorMessage = (error, fallback) => {
+    if (error.name === 'AbortError') {
+      return 'The request took too long. Please try again.';
+    }
+
+    return error.message || fallback;
+  };
+
+  const validateImageFile = (selectedFile) => {
+    if (!selectedFile) {
+      return 'Please choose an image first.';
+    }
+
+    if (!(selectedFile instanceof File)) {
+      return 'Please choose a valid image file.';
+    }
+
+    if (!selectedFile.type.startsWith('image/')) {
+      return 'Please choose a PNG, JPG, or another image file.';
+    }
+
+    if (selectedFile.size > MAX_IMAGE_SIZE) {
+      return 'Please choose an image smaller than 5MB.';
+    }
+
+    return '';
+  };
+
+  const handleFileSelect = (selectedFile) => {
+    const error = selectedFile ? validateImageFile(selectedFile) : '';
+    setFileError(error);
+    setSaveError('');
+
+    if (error) {
+      setFile('');
+      return;
+    }
+
+    setFile(selectedFile);
+  };
+
   const handleSubmit = async (type) => {
-    if(!prompt) return alert("Please enter a prompt");
+    const trimmedPrompt = prompt.trim();
+
+    if(!trimmedPrompt) {
+      setAiError("Please enter a prompt.");
+      return;
+    }
+
+    setAiError('');
+    setSaveError('');
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), AI_REQUEST_TIMEOUT);
+
     try {
       setGeneratingImg(true);
-      const response = await fetch("https://ai-stitches.onrender.com/api/v1/ai", {
+      const response = await fetch(AI_ENDPOINT, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',       
         },
         body: JSON.stringify({
-          prompt,
-          textureType: type, // Add the textureType parameter
-        })
+          prompt: trimmedPrompt,
+          textureType: type,
+        }),
+        signal: controller.signal,
       })
 
       if (!response.ok) {
-        throw new Error('Failed to fetch response from OpenAI API, if you like sleep');
+        throw new Error('Unable to generate an image right now. Please try again.');
       }
+
       const data = await response.json();
-      handleDecals(type, `data:image/png;base64,${data.photo}`)
-      setFile(data.photo)
-      console.log(data.photo)
+      if (!data?.photo) {
+        throw new Error('The AI response did not include an image.');
+      }
+
+      const imageData = `data:image/png;base64,${data.photo}`;
+      handleDecals(type, imageData)
+      setFile(imageData)
+      setFileError('');
     } catch (error) {
-      alert(error)
+      setAiError(getErrorMessage(error, 'Unable to generate an image right now. Please try again.'));
     } finally {
+      clearTimeout(timeoutId);
       setGeneratingImg(false);
-      setActiveEditorTab("");
     }
   }
 
@@ -119,7 +172,6 @@ const Customizer = ({handleViewSavedDesigns}) => {
         break;
     }
 
-    // after setting the state, activeFilterTab is updated
     setShowJoyRide(false)
     setActiveFilterTab((prevState) => {
       return {
@@ -130,67 +182,78 @@ const Customizer = ({handleViewSavedDesigns}) => {
   }
 
   const readFile = (type) => {
+    setFileError('');
+    setSaveError('');
+
+    if (typeof file === 'string' && file.startsWith('data:')) {
+      handleDecals(type, file);
+      setActiveEditorTab("");
+      return;
+    }
+
+    const error = validateImageFile(file);
+    if (error) {
+      setFileError(error);
+      return;
+    }
+
     reader(file)
       .then((result) => {
         handleDecals(type, result);
         setActiveEditorTab("");
       })
+      .catch((error) => setFileError(getErrorMessage(error, 'Unable to read that image. Please try another file.')))
   }
 
  
   const saveCanvasState = (designDetails) => {
     try {
-      // Get existing designs from local storage
       const existingDesignsString = localStorage.getItem('CanvasState');
       const existingDesigns = existingDesignsString ? JSON.parse(existingDesignsString) : [];
-      
-  
-      // Add the new design details to the existing designs
       const updatedDesigns = [...existingDesigns, designDetails];
-  
-      // Serialize and store the updated designs in local storage
-      const serializedState = JSON.stringify(updatedDesigns);
-      localStorage.setItem('CanvasState', serializedState);
+      handleDesignsChange(updatedDesigns);
+      return updatedDesigns;
     } catch (error) {
-      console.error('Error saving:', error);
+      console.error('Unable to save design:', error);
+      return null;
     }
   }
   
 
-  const handleSavedDesign = async (event) => {
-    downloadCanvasToImage()
-    const textureType = state.isFullTexture ? 'fullTexture' : 'logoTexture';
+  const handleSavedDesign = async () => {
+    setSaveError('');
   
     try {
+      downloadCanvasToImage()
+      const textureType = state.isFullTexture ? 'fullTexture' : 'logoTexture';
       const imageData = file ? await getFileAsBase64(file) : snap.logoDecal;
+
       if (!imageData) {
         throw new Error('Failed to get image data');
       }
   
       const designDetails = {
+        id: crypto.randomUUID(),
         color: snap.color,
-        file: file.name,
-        imageData: imageData,
-        textureType: textureType
+        file: file?.name || 'Generated image',
+        imageData,
+        textureType
       };
-      saveCanvasState(designDetails);
-      alert('Your design has been saved!');
-      console.log('Shirt Color in customiser:', snap.color);
-      console.log('Shirt File in customiser:', file);
-      console.log(designDetails);
+      const savedDesigns = saveCanvasState(designDetails);
+      if (savedDesigns) {
+        alert('Your design has been saved.');
+      }
     } catch (error) {
-      console.error('Error saving design:', error);
-      // Handle the error as needed, e.g., show an error message to the user
+      console.error('Unable to save design:', error);
+      setSaveError(getErrorMessage(error, 'Unable to save your design. Please try again.'));
     }
   };
 
   const getFileAsBase64 = async (file) => {
     if (!file) {
-      console.error('File object is null or undefined');
       return null;
     }
   
-    // Check if the file is already a data URL
     if (typeof file === 'string' && file.startsWith('data:')) {
       return file;
     }
@@ -200,7 +263,6 @@ const Customizer = ({handleViewSavedDesigns}) => {
       reader.onload = () => resolve(reader.result);
       reader.onerror = (error) => reject(error);
       
-      // Check if file is a Blob or File object before reading as data URL
       if (file instanceof Blob || file instanceof File) {
         reader.readAsDataURL(file);
       } else {
@@ -210,71 +272,64 @@ const Customizer = ({handleViewSavedDesigns}) => {
   };
   
 
-// Initialize Joyride steps
 useEffect(() => {
 
   const steps = [
     {
       target: '.tabs',
-      content: 'This is tabs help you edit the shirt properties',
+      content: 'Use these tabs to edit the shirt.',
       key: 'key-1',
     },
     {
       target: '.color-picker',
-      content: 'Click here to change the color of the shirt',
+      content: 'Change the shirt color.',
       key: 'color-step'
     },
     {
       target: '.file-picker',
-      content: 'Click here to add an image to the shirt, could be a logo or a full print',
+      content: 'Upload an image for a logo or full-shirt print.',
       key: 'file-step'
     },
     
     {
       target: '.ai-picker',
-      content: 'Click here to describe to our AI tool, what type of design you want',
+      content: 'Describe the design you want to generate.',
       key: 'aipicker-step'
     },
     {
       target: '.logo-shirt',
-      content: 'Click here to add or remove the logo',
+      content: 'Show or hide the logo texture.',
       key: 'logo-step'
     },
     {
       target: '.style-shirt',
-      content: 'Click here to add or remove the full print',
+      content: 'Show or hide the full-shirt texture.',
       key: 'full-step'
     },
     {
       target: '.download-btn',
-      content: `Click here to download your custom designs to image gallery
-      and in the app`,
+      content: 'Download and save your current design.',
       key: 'download-step'
     },
     {
       target: '.view',
-      content: 'Click here to view saved designs',
+      content: 'View your saved designs.',
       key: 'view-step'
     },
     {
       target: '.help-button',
-      content: 'Click here to go over how the buttons work again',
+      content: 'Restart this guide.',
       key: 'help-step'
     }
   ];
 
   setJoyrideSteps(steps);
-  console.log('Joyride steps:', steps);
-  console.log('EditorTabs', EditorTabs);
-  
- 
 }, [])
 
-
-  // Event handler for when joyride ends
   const handleJoyrideCallback = (data) => {
-    console.log(data);  
-    // You can update state or perform actions based on joyride events
+    if (data.status === 'finished' || data.status === 'skipped') {
+      setShowJoyRide(false);
+    }
   }
 
   const toggleHelp = () => {
@@ -302,9 +357,9 @@ useEffect(() => {
             </div>
             <div className="flex items-center min-h-screen">
               <div className=" editortabs-container tabs">
-                {EditorTabs.map((tab, index) => (
+                {EditorTabs.map((tab) => (
                   <Tab 
-                  key={uuidv4()}
+                    key={tab.name}
                     tab={tab}
                     handleClick = {() => handleTabClick(tab.name)}
                     className= {tab.className}
@@ -324,7 +379,6 @@ useEffect(() => {
                         scrollToFirstStep={true}
                         showProgress={true}
                         callback={handleJoyrideCallback}
-                        key={uuidv4()}
                       />
                     )
                   }
@@ -336,7 +390,7 @@ useEffect(() => {
             <div className="view mx-4">
               <CustomButton
                  type="filled"
-                 title="View saved design"
+                 title="Saved Designs"
                  handleClick={handleViewSavedDesigns}
                  customStyles="m-0 w-28"
                  />
@@ -348,9 +402,9 @@ useEffect(() => {
             className='filtertabs-container'
             {...slideAnimation("up")}
           >
-            {FilterTabs.map((tab, index) => (
+            {FilterTabs.map((tab) => (
               <Tab
-                key={uuidv4()}
+                key={tab.name}
                 tab={tab}
                 isFilterTab
                 isActiveTab={activeFilterTab[tab.name]}
@@ -365,11 +419,12 @@ useEffect(() => {
                             className='w-3/5 h-3/5 object-contain'
                         />
                     </button>
+                    {saveError && <p className="save-error">{saveError}</p>}
                     <CustomButton
                   type="filled"
-                  title="Help?"
-                  className='help-button'
-                  customStyles='max-w-[100px]' />
+                  title="Help"
+                  handleClick={toggleHelp}
+                  customStyles='help-button w-fit px-4 py-2.5 font-bold text-sm' />
 
           </motion.div>
         </>

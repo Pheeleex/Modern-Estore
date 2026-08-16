@@ -72,7 +72,7 @@ const Home = () => {
                             { loaded && (
                                 <CustomButton
                                     type="filled"
-                                    title="Customise It"
+                                    title="Customize It"
                                     handleClick={handleClick}
                                     customStyles='w-fit px-4 py-2.5 font-bold text-sm'
                                 />
@@ -86,5 +86,4 @@ const Home = () => {
 };
 
 export default Home;
-
 

@@ -1,5 +1,10 @@
 export const downloadCanvasToImage = () => {
   const canvas = document.querySelector("canvas");
+
+  if (!canvas) {
+    throw new Error("No canvas found to download.");
+  }
+
   const dataURL = canvas.toDataURL();
   const link = document.createElement("a");
 
@@ -12,8 +17,14 @@ export const downloadCanvasToImage = () => {
 
 export const reader = (file) =>
   new Promise((resolve, reject) => {
+    if (!(file instanceof Blob || file instanceof File)) {
+      reject(new Error("Please choose a valid image file."));
+      return;
+    }
+
     const fileReader = new FileReader();
     fileReader.onload = () => resolve(fileReader.result);
+    fileReader.onerror = (error) => reject(error);
     fileReader.readAsDataURL(file);
   });
 

@@ -1,32 +1,9 @@
-import React, { useEffect, useState } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Environment, Center } from '@react-three/drei';
+import { Center } from '@react-three/drei';
 import CameraRig from './CameraRig';
 import NewShirt from './NewShirt';
-import { AnimatePresence } from 'framer-motion';
 
-const NewCanvas = ({ color, id, savedDesign, imgDecal, textureType }) => {
-  const [hdrFileData, setHdrFileData] = useState(null);
-
-  useEffect(() => {
-    const hdrFilePath = '/hdr/potsdamer_platz_1k.hdr';
-
-    fetch(hdrFilePath)
-      .then((response) => response.blob())
-      .then((hdrBlob) => {
-        setHdrFileData(URL.createObjectURL(hdrBlob));
-      })
-      .catch((error) => {
-        console.error('Error fetching HDR file:', error);
-      });
-
-    return () => {
-      if (hdrFileData) {
-        URL.revokeObjectURL(hdrFileData);
-      }
-    };
-  }, []);
-
+const NewCanvas = ({ color, id, imgDecal, textureType }) => {
   return (
     <div style={{ width: '80%', height: '50vh', margin: '0px auto' }}>
       <Canvas
@@ -38,14 +15,12 @@ const NewCanvas = ({ color, id, savedDesign, imgDecal, textureType }) => {
         <ambientLight intensity={0.5} />
         <CameraRig>
           <Center>
-            <AnimatePresence>
-              <NewShirt 
-                    color={color} 
-                    id={id} 
-                    savedDesign={savedDesign} 
-                    textureType={textureType}
-                    imgDecal={imgDecal} />
-            </AnimatePresence>
+            <NewShirt
+              color={color}
+              id={id}
+              textureType={textureType}
+              imgDecal={imgDecal}
+            />
           </Center>
         </CameraRig>
       </Canvas>
