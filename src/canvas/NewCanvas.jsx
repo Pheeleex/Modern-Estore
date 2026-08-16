@@ -5,7 +5,7 @@ import NewShirt from './NewShirt';
 
 const NewCanvas = ({ color, id, imgDecal, textureType }) => {
   return (
-    <div style={{ width: '80%', height: '50vh', margin: '0px auto' }}>
+    <div className="saved-canvas">
       <Canvas
         shadows
         camera={{ position: [0, 0, 0], fov: 25 }}

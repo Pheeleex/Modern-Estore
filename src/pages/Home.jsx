@@ -1,5 +1,3 @@
-//import React from 'react'
-
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSnapshot } from 'valtio'
 
@@ -15,6 +13,16 @@ import { CustomButton } from '../components';
 import { useEffect, useState } from 'react';
 import { TypeAnimation } from 'react-type-animation';
 
+const landingWords = [
+    'Garments',
+    1000,
+    'Graphics',
+    1000,
+    'Colorways',
+    1000,
+    'Statements',
+    1000,
+];
 
 const Home = () => {
     const snap = useSnapshot(state);
@@ -35,49 +43,53 @@ const Home = () => {
         <AnimatePresence>
             {snap.intro && (
                 <motion.section className='home' {...slideAnimation('left')}>
-                    <motion.header {...slideAnimation('down')}>
+                    <motion.header className='landing-header' {...slideAnimation('down')}>
                         <h1 className='logo'>Oysterlabs</h1>
+                        <div className='landing-header-meta'>
+                            <span>3D atelier</span>
+                            <span>Live garment system</span>
+                        </div>
                     </motion.header>
                     <motion.div className='home-content'{...headContainerAnimation}>
-                        <motion.div className='home-content' {...headTextAnimation}>
-                            
+                        <motion.div className='landing-title-wrap' {...headTextAnimation}>
+                            <p className='landing-kicker'>Wearable interface / made in motion</p>
+                            <h1 className='head-text'>
+                                Shape
+                                <span>
                             <TypeAnimation
-                                sequence={[
-                                // Same substring at the start will only be typed out once, initially
-                                    'Your Style',
-                                    1000, // wait 1s before replacing "Mice" with "Hamsters"
-                                    'Your Rules',
-                                    1000,
-                                    'Your Looks',
-                                    1000,
-                                    'Your Wardrobe',
-                                    1000,
-                                    'Your Fits.',
-                                    1000,
-                                ]}
-                                    wrapper="h1"
+                                        sequence={landingWords}
+                                        wrapper="span"
                                     speed={50}
-                                    className='head-text'
                                     repeat={Infinity}
                                     cursor= {false}
                                 />
+                                </span>
+                            </h1>
                         </motion.div>
                         <motion.div
                             {...headContentAnimation}
-                            className='flex flex-col gap-5'
+                            className='home-copy flex flex-col gap-5'
                         >
-                            <p className='para max-w-md font-normal text-gray-600 text-base'>
-                                Create your unique and exclusive shirt with our brand-new 3D customization tool. <strong>Bring your imagination to life</strong>{" "} and define your own style
+                            <p className='para'>
+                                A playful design studio for one-of-one shirts. Paint with color, source graphics from your own archive, or generate something unexpected.
                             </p>
-                            { loaded && (
-                                <CustomButton
-                                    type="filled"
-                                    title="Customize It"
-                                    handleClick={handleClick}
-                                    customStyles='w-fit px-4 py-2.5 font-bold text-sm'
-                                />
-                            )}
+                            <div className='landing-actions'>
+                                { loaded && (
+                                    <CustomButton
+                                        type="filled"
+                                        title="Enter Studio"
+                                        handleClick={handleClick}
+                                        customStyles='landing-primary-button'
+                                    />
+                                )}
+                                <span className='landing-note'>Rotate, recolor, print, save.</span>
+                            </div>
                         </motion.div>
+                    </motion.div>
+                    <motion.div className='landing-strip' {...headContentAnimation}>
+                        <span>Generative print</span>
+                        <span>Realtime canvas</span>
+                        <span>Personal archive</span>
                     </motion.div>
                 </motion.section>
             )}
@@ -86,4 +98,3 @@ const Home = () => {
 };
 
 export default Home;
-

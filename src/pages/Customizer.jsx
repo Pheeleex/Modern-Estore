@@ -343,10 +343,23 @@ useEffect(() => {
       {!snap.intro && (
         <>
           <motion.div
-            className="absolute top-0 left-0 z-10"
+            className="studio-hud"
+            {...fadeAnimation}
+          >
+            <div>
+              <p className="studio-hud-label">Oysterlabs Studio</p>
+              <p className="studio-hud-title">Live garment composer</p>
+            </div>
+            <div className="studio-hud-color">
+              <span style={{ backgroundColor: snap.color }} />
+              <strong>{snap.color}</strong>
+            </div>
+          </motion.div>
+          <motion.div
+            className="customizer-side-panel"
             {...slideAnimation('left')}
           >
-            <div className='mt-4 flex  p-0'>
+            <div className='customizer-back'>
             <CustomButton 
               type="filled"
               title="Go Back"
@@ -355,7 +368,7 @@ useEffect(() => {
             />
                  
             </div>
-            <div className="flex items-center min-h-screen">
+            <div className="editor-shell">
               <div className=" editortabs-container tabs">
                 {EditorTabs.map((tab) => (
                   <Tab 
@@ -383,16 +396,16 @@ useEffect(() => {
                     )
                   }
           <motion.div
-            className="absolute z-10 top-5 right-5"
+            className="saved-designs-action"
             {...fadeAnimation}
           >
             <div className="flex sm:flex-row gap-4">
-            <div className="view mx-4">
+            <div className="view">
               <CustomButton
                  type="filled"
                  title="Saved Designs"
                  handleClick={handleViewSavedDesigns}
-                 customStyles="m-0 w-28"
+                 customStyles="saved-designs-button"
                  />
               </div>
             </div>
@@ -402,6 +415,7 @@ useEffect(() => {
             className='filtertabs-container'
             {...slideAnimation("up")}
           >
+            <div className="toolbelt-label">Texture</div>
             {FilterTabs.map((tab) => (
               <Tab
                 key={tab.name}
